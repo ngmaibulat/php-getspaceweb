@@ -12,3 +12,6 @@ $plugins = $container->get('plugin');
 
 
 $plugins->register(\Plugin\LangRussian\LangRussianPlugin::class);
+
+// searchengine plugin
+$plugins->register(\Plugin\SearchOptimization\SearchOptimizationPlugin::class);
