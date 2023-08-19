@@ -2,10 +2,6 @@
 .vscode
 .DS_Store
 
-/theme/*
-!/theme/default
-!/theme/older
-
 
 /vendor/*
 !/vendor/.gitkeep

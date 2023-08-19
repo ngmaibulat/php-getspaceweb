@@ -6,6 +6,7 @@ return function (ContainerBuilder $containerBuilder): void {
     $_DEBUG = (bool) ($_ENV['DEBUG'] ?? false);
     $_DATABASE = ($_ENV['DATABASE'] ?? false);
 
+
     // doctrine
     $containerBuilder->addDefinitions([
         'doctrine' => [

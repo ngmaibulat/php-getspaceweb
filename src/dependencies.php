@@ -109,9 +109,18 @@ return function (ContainerBuilder $containerBuilder): void {
                 ['displayErrorDetails' => $c->get('settings')['displayErrorDetails']]
             );
 
+            $appenv = getenv('APP_ENV');
+
+            if ($appenv == 'dev' ) {
+                $cache = false;
+            }
+            else {
+                $cache = $settings['caches_path'];
+            }
+
             $view = \Slim\Views\Twig::create($settings['template_path'], [
                 'debug' => $settings['displayErrorDetails'],
-                'cache' => $settings['caches_path'],
+                'cache' => $cache,
                 'auto_reload' => $settings['displayErrorDetails'],
             ]);
 
