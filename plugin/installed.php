@@ -9,3 +9,6 @@ $plugins = $container->get('plugin');
 // Example
 // $plugins->register(\Plugin\Example\ExamplePlugin::class);
 // $plugins->register(new \Plugin\Example\ExamplePlugin($container));
+
+
+$plugins->register(\Plugin\LangRussian\LangRussianPlugin::class);
