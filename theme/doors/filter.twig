@@ -1,0 +1,92 @@
+
+<div class="filter">
+    <div class="title title_dark">
+        <div class="title__main">Поиск по параметрам</div>
+        <div class="title__sub">Найти двери по Вашим требованиям
+        </div>
+    </div>
+
+    {% set categories = catalog_category() %}
+    <div class="row">
+        <div class="col-md-12 text-center" id="filter-tabs">
+            <ul class="nav justify-content-center">
+                {% for category in categories %}
+                    {% if category.uuid.toString() in ['1e7004cc-19e7-432e-860d-95bdb16004b2', '502c3d3a-fce8-4f51-bb7f-05a594c9229b'] %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn_dark btn_animation mx-1 {{ loop.index == 1 ? 'active' }}" data-toggle="tab" id="nav-{{ loop.index }}" href="#tab-{{ loop.index }}">
+                                {{ category.title }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-12 tab-content">
+            {% for category in categories %}
+                {% if category.uuid.toString() in ['1e7004cc-19e7-432e-860d-95bdb16004b2', '502c3d3a-fce8-4f51-bb7f-05a594c9229b'] %}
+                    <div class="tab-pane fade {{ loop.index == 1 ? 'show active' }}" id="tab-{{ loop.index }}">
+                        <form action="/catalog/{{ category.address }}" method="get" name="catalog_filter">
+
+                            {% for attribute in category.getAttributes() %}
+                                {% if attribute.type != 'boolean' %}
+                                    <div class="filter-param js-spoiler">
+                                        <div class="filter-param__title js-spoiler-link">
+                                            <span class="filter-param__title-inner">{{ attribute.title }}</span>
+                                        </div>
+
+                                        <div class="filter-param__list-wrapper js-spoiler-box">
+                                            <div class="filter-param__list ">
+                                                {% for variant in attribute.getProductAttributes().pluck('value').unique() %}
+                                                    <input type="checkbox" id="{{ attribute.address }}-{{ loop.index }}" name="{{ attribute.address }}[]" value="{{ variant }}" class="" />
+                                                    <label for="{{ attribute.address }}-{{ loop.index }}" class="filter-param__label filter-param__label_default filter-param__label_color">{{ variant }}</label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="filter__bottom">
+                                <button class="btn btn_dark btn_animation">
+                                    <div class="btn__border btn__border_lr">
+                                        <div class="btn__border btn__border_tb"></div>
+                                    </div>
+                                    <span>Показать выбранные</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type=checkbox]:checked+label.filter-param__label_color:before {
+        background: url(/resource/img/check.svg) 50% no-repeat;
+    }
+
+    label[for="color-41"]:before {
+        content:'';
+        background-color: #ffffff;
+    }
+    label[for="color-42"]:before {
+        content:'';
+        background-color: #dedede;
+    }
+    label[for="color-43"]:before {
+        content:'';
+        background-color: #f2e4ba;
+    }
+    label[for="color-44"]:before {
+        content:'';
+        background-color: #633007;
+    }
+    label[for="color-45"]:before {
+        content:'';
+        background-color: #000000;
+    }
+</style>

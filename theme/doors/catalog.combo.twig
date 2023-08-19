@@ -1,0 +1,69 @@
+{% set breadcrumbs = catalog_category_parents(category) %}
+
+<div class="l-page__breadcrumb">
+    <ol class="breadcrumb" itemscope="" itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/" title="Главная"><span itemprop="name">Главная</span>
+                <meta itemprop="position" content="1">
+            </a>
+        </li>
+        <li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/{{ parameter('catalog_address', 'catalog') }}" title="Каталог"><span itemprop="name">Каталог</span>
+                <meta itemprop="position" content="2">
+            </a>
+        </li>
+
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.index != loop.length %}
+                <li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">
+                    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ breadcrumb.address }}">{{ breadcrumb.title }}</a>
+                </li>
+            {% else %}
+                {% if subcats|count == 0 %}
+                    {% set subcats = categories.where('parent', '=', category.parent) %}
+                    {% set breadcrumb = breadcrumbs|count == 1 ? null : breadcrumbs.get(loop.index - 1) %}
+                {% else %}
+                    <li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">
+                        <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ breadcrumb.address }}">{{ breadcrumb.title }}</a>
+                    </li>
+                {% endif %}
+
+                <label id="catalog-category-label"  style="padding-left: 15px">
+                    <select id="catalog-category-select" class="form-control my-3 my-sm-0">
+                        <option value="/{{ parameter('catalog_address', 'catalog') }}/{{ breadcrumb.address ?? '' }}">Все подкатегории</option>
+
+                        {% for subcat in subcats %}
+                            {% set selected = '/' ~ parameter('catalog_address', 'catalog') ~ '/' ~ subcat.address == current_path() ? 'selected' : '' %}
+
+                            <option {{ selected }} value="/{{ parameter('catalog_address', 'catalog') }}/{{ subcat.address }}">
+                                {{ subcat.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+            {% endif %}
+        {% else %}
+            <label id="catalog-category-label"  style="padding-left: 15px">
+                <select id="catalog-category-select" class="form-control my-3 my-sm-0">
+                    <option value="/{{ parameter('catalog_address', 'catalog') }}">Все подкатегории</option>
+                    {% for subcat in subcats %}
+                        {% set selected = '/' ~ parameter('catalog_address', 'catalog') ~ '/' ~ subcat.address == current_path() ? 'selected' : '' %}
+
+                        <option {{ selected }} value="/{{ parameter('catalog_address', 'catalog') }}/{{ subcat.address }}">
+                            {{ subcat.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+        {% endfor %}
+    </ol>
+</div>
+
+<script>
+    document.querySelector('#catalog-category-select').addEventListener('change', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        location.pathname = e.target.value;
+    });
+</script>

@@ -1,0 +1,46 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let storage = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        function render(storage) {
+            $('[data-favorites-cart-count]').text(storage.length).parents('a').toggle(storage.length !== 0);
+            $('[data-favorite-product]').removeClass('active');
+
+            for (let item of storage) {
+                $('[data-favorite-product="' + item.uuid + '"]').addClass('active');
+            }
+        }
+        render(storage);
+
+        $('[data-click="favorite"]').on('click', (e) => {
+            let item = {
+                uuid: '', title: '', url: '', price: '', thumb: ''
+            };
+
+            let $el = $(e.currentTarget),
+                $parents = $el.parents('[data-catalog-item]');
+
+            if ($parents.length === 0) {
+                $parents = $('[data-catalog-item-attr="uuid"]:contains("' + $el.attr('data-favorite-product') + '")').parent();
+            }
+
+            $parents.find('[data-catalog-item-attr]').each((i, prop) => {
+                let $prop = $(prop);
+
+                item[$prop.attr('data-catalog-item-attr')] = $prop.text();
+            });
+
+            let storage = JSON.parse(localStorage.getItem('favorites') || '[]'),
+                index = storage.findIndex(obj => obj['uuid'] === item.uuid);
+
+            if (index === -1) {
+                storage.push(item);
+            } else {
+                storage.splice(index, 1);
+            }
+
+            render(storage);
+            localStorage.setItem('favorites', JSON.stringify(storage));
+        });
+    });
+</script>

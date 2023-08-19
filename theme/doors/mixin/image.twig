@@ -1,0 +1,12 @@
+{#
+    placeholder - ссылка на заглушку
+    src - ссылка на картинку
+    id - attr id
+    class - attr class
+    alt - attr alt
+    title - attr title
+    style - attr style
+#}
+{% htmlcompress %}
+    <img data-lazyload-image data-src="{{ src }}" src="{{ placeholder ? placeholder : 'https://via.placeholder.com/1' }}" {{ id ? ('id="'~ id|trim ~ '"')|raw : '' }} {{ class ? ('class="'~ class|trim ~'"')|raw : '' }} {{ alt ? ('alt="'~ alt|trim ~'"')|raw : '' }} {{ title ? ('title="'~ title|trim ~'"')|raw : '' }} {{ style ? ('style="'~ style|trim ~'"')|raw : '' }} />
+{% endhtmlcompress %}

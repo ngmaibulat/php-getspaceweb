@@ -1,0 +1,67 @@
+{% if product is iterable %}
+    {% set products = product %}
+    {% set product = product.first() %}
+{% endif %}
+
+{% set src = 'https://dummyimage.com/640x360/fff/aaa' %}
+{% if product.hasFiles() %}
+    {% set src = product.getFiles().first().getPublicPath('middle') %}
+{% endif %}
+
+<div class="product-card col-12 col-sm-6 col-md-4 " data-catalog-item>
+    <div class="product-card__image-wrap">
+        <a class="merch merch_solid" href="/{{ parameter('catalog_address', 'catalog') }}/{{ product.address }}">
+            {% include 'mixin/image.twig' with {
+                'src': src,
+                'title': product.title,
+                'alt': product.title,
+                'style': 'display:block; height: 100%; width: auto; object-fit: contain; object-position: center center;'
+            } only %}
+            {% include 'catalog.product.sale.twig' with { 'products': products, 'product': product } only %}
+        </a>
+    </div>
+    <div class="product-card__desc">
+        <div class="product-card__row">
+            <h4 class="product-card__title">{{ products ? product.field1 : product.title }}</h4>
+        </div>
+
+        <div class="product-card__color"></div>
+
+        {% for colors in products.sortBy('price') %}
+            {% set sale = false %}
+            {% for attr in colors.getAttributes() %}
+                {% if attr.attribute.address == 'tovar-po-akcii' %}
+                    {% set sale = true %}
+                {% endif %}
+            {% endfor %}
+            <a
+                href="/{{ parameter('catalog_address', 'catalog') }}/{{ colors.address }}"
+                style="display: block"
+                class="product-card__color"
+                data-img="{{ colors.getFiles().first().getPublicPath('middle') }}"
+                data-sale="{{ sale ? 'true' : 'false' }}"
+            >
+                {{ colors.title }}{{ sale ? '*' }}
+            </a>
+        {% endfor %}
+
+        <div class="product-card__price-wrap">
+            <div class="product-card__price product-card__price_actual text-center">
+                {% if products is iterable %}
+                    от {{ products.min('price')|number_format(0 , '.', ' ') }} руб.
+                {% else %}
+                    {{ product.price|number_format(0 , '.', ' ') }} руб.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ product.address }}" class="product-card__btn btn btn_dark btn_animation">
+        <div class="btn__border btn__border_lr">
+            <div class="btn__border btn__border_tb"></div>
+        </div>
+        <span>Подробнее</span>
+    </a>
+
+    {# include product options #}
+    {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+</div>

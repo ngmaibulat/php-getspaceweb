@@ -1,0 +1,22 @@
+{% set src = subcat.getFiles().first().getPublicPath('middle') %}
+
+{% if src is empty %}
+    {% set src = 'https://via.placeholder.com/300' %}
+{% endif %}
+
+<div class="collection-item">
+    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ subcat.address }}" class="collection-item__img">
+        <noscript>
+            <img src="{{ src }}" alt="{{ subcat.title }}">
+        </noscript>
+        <img data-src="{{ src }}" alt="{{ subcat.title }}" class="loaded"
+             src="{{ src }}" data-was-processed="true">
+    </a>
+    <div class="collection-item__info">
+        <div class="collection-item__text">
+            <div class="collection-item__title">{{ subcat.title }}</div>
+
+        </div>
+
+    </div>
+</div>

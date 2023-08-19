@@ -1,0 +1,13 @@
+{% set pages = (pagination.count / pagination.page)|round(0, 'ceil') %}
+
+{% if pages > 1 %}
+    <div class="pagination">
+        <span class="pagination__text">Страницы:</span>
+
+        {% for page in 0..pages-1 %}
+            <a href="{{ non_page_path() }}{{ page ? '/' ~ page : '' }}{{ current_query() }}" class="pagination__link {{ current_page_number() == page ? 'pagination__link_current' : '' }}">
+                {{ page + 1 }}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

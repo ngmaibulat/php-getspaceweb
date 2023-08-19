@@ -1,0 +1,59 @@
+<section class="slider slider_main swiper-hidden swiper-container swiper-container-horizontal js-main-slider">
+    <div class="slider__list swiper-wrapper">
+
+        {# Категория "Слайдер" #}
+        {% for item in publication({category: 'ec715009-1e3e-4cc4-937d-5ac7cad02503'}) %}
+            <div class="slider__slide swiper-slide  js-slide">
+                <div class="slider__slide-image">
+                    <a class="slider__slide-ref js-slider-ref" href="#">
+                        {% if item.hasFiles() %}
+                            {% include 'mixin/image.twig' with {
+                                'src': item.getFiles().first().getPublicPath('middle'),
+                                'id': 'attr-id-value',
+                                'class': 'slider__slide-desktop slider__slide-picture swiper-lazy js-slider-img d-none d-md-block',
+                                'title': 'Входные и межкомнатные двери',
+                                'alt': 'Входные и межкомнатные двери',
+                            } only %}
+                            {% include 'mixin/image.twig' with {
+                                'src': item.getFiles().last().getPublicPath('middle'),
+                                'id': 'attr-id-value',
+                                'class': 'slider__slide-mobile slider__slide-picture swiper-lazy js-slider-img d-block d-md-none',
+                                'title': 'Входные и межкомнатные двери',
+                                'alt': 'Входные и межкомнатные двери',
+                            } only %}
+                        {% endif %}
+                    </a>
+                </div>
+                <p class="slicetext">
+                    <a href="{{ item.content.short|striptags }}">Подробнее</a>
+                </p>
+            </div>
+        {% endfor %}
+
+    </div>
+    <div class="slider__pagination"></div>
+
+    <div class="swiper-button-prev">
+        <svg class="swiper-button__svg" width="22" height="61" aria-hidden="true">
+            <use xlink:href="/resource/img/symbol-sprite.svg#icon-arrow_left"></use>
+        </svg>
+    </div>
+    <div class="swiper-button-next">
+        <svg class="swiper-button__svg" width="22" height="61" aria-hidden="true">
+            <use xlink:href="/resource/img/symbol-sprite.svg#icon-arrow_right"></use>
+        </svg>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        $('.slider_main .slider__list').slick({
+            dots: true,
+            infinite: true,
+            speed: 300,
+            prevArrow: 'div.swiper-button-prev',
+            nextArrow: 'div.swiper-button-next',
+            autoplay: true,
+        });
+    });
+</script>

@@ -1,0 +1,344 @@
+{% extends 'main.twig' %}
+
+{% block title %}{{ product.meta.title ? product.meta.title : (product.title ?? 'Товар') }} | {{ parent() }}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <meta name="description" content="{{ product.meta.description ? product.meta.description : (product.meta.title ? product.meta.title : product.description|striptags) }}">
+{% endblock %}
+
+{% block page %}
+    <script>
+        window.catalog = {
+            events: {
+                'on:ready': (data, cart, obj) => {
+                    $('[data-catalog-item-add-group]').on('click', (e) => {
+                        $(e.currentTarget).parents('div.tab-content').find('[data-catalog-item]').each((index, el) => {
+                            obj.cartAddItemFromJQuery($(el));
+                        });
+
+                        Swal.fire({
+                            title: 'Комплект добавлен',
+                            text: 'Комплект добавлен',
+                            icon: 'success',
+                            showCancelButton: true,
+                            cancelButtonText: 'Продолжить выбор дверей',
+                            cancelButtonColor: '#6b6b6b',
+                            confirmButtonText: 'Оформить заказ',
+                            confirmButtonColor: '#28a745'
+                        }).then((result) => {
+                            if (result.value) {
+                                location.href = '/cart';
+                            }
+                        });
+                    });
+                },
+                'on:cart:add': (data) => {
+                    Swal.fire({
+                        title: 'Товар добавлен',
+                        text: data.title + ' (x' + data.quantity + ') теперь в корзине.',
+                        icon: 'success',
+                        showCancelButton: true,
+                        cancelButtonText: 'Продолжить выбор дверей',
+                        cancelButtonColor: '#6b6b6b',
+                        confirmButtonText: 'Оформить заказ',
+                        confirmButtonColor: '#28a745'
+                    }).then((result) => {
+                        if (result.value) {
+                            location.href = '/cart';
+                        }
+                    });
+                },
+                'on:cart:update': (data) => {
+                    Swal.fire({
+                        title: 'Товар обновлен',
+                        text: data.title + ' (x' + data.quantity + ')',
+                        icon: 'success',
+                        showCancelButton: true,
+                        cancelButtonText: 'Продолжить выбор дверей',
+                        cancelButtonColor: '#6b6b6b',
+                        confirmButtonText: 'Оформить заказ',
+                        confirmButtonColor: '#28a745'
+                    }).then((result) => {
+                        if (result.value) {
+                            location.href = '/cart';
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+
+    <div class="container">
+        <div class="site-pagination">
+            <a href="/">Главная</a> /
+            <a href="/{{ parameter('catalog_address', 'catalog') }}">Каталог</a>
+            {% for breadcrumb in catalog_category_parents(category) %}
+                / <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ breadcrumb.address }}">{{ breadcrumb.meta.title ? breadcrumb.meta.title : breadcrumb.title }}</a>
+            {% endfor %} /
+            <span>{{ product.meta.title ? product.meta.title : (product.title ?? 'Товар') }}</span>
+        </div>
+
+        <h1>{{ product.title }}</h1>
+
+        <div class="row">
+            <div class="col-12 col-md-5 mb-3 popup-gallery">
+                <a href="{{ product.hasFiles() ? product.getFiles().first().getPublicPath() : '/assets/img/no_image.png' }}" class="product-pic-zoom" style="display: block">
+                    {% include 'mixin/image.twig' with {
+                        'src': product.hasFiles() ? product.getFiles().first().getPublicPath('middle') : '/assets/img/no_image.png',
+                        'class': 'product-big-img',
+                        'title': product.title,
+                        'alt': product.title,
+                        'style': 'display:block; height: 350px; width: 100%; object-fit: contain; object-position: center center;'
+                    } only %}
+
+                    {% include 'catalog.product.sale.twig' with { 'product': product } only %}
+                </a>
+                <div class="product-thumbs" tabindex="1" style="overflow: hidden; outline: none;">
+                    <div class="product-thumbs-track" style="width: 100%;">
+                        <div class="owl-carousel owl-theme">
+                            {% for index, file in product.getFiles() %}
+                                <div class="pt {{ index == 0 ? 'active' : '' }}" data-imgbigurl="{{ file.getPublicPath('middle') }}">
+                                    <img src="{{ file.getPublicPath('small') }}" title="{{ product.title }}" alt="{{ product.title ~ ' ' ~ index }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-7">
+                <div class="row mb-3">
+                    <div class="col-12 mb-3">
+                        {% if product.description %}
+                            <h4>Описание</h4>
+
+                            <p class="text-justify">{{ product.description|raw }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-12 col-md-7">
+                        <h4>Характеристики</h4>
+                        <dl class="row d-flex justify-content-start">
+                            {% if product.country %}
+                                <div class="col-6">
+                                    <dt>Страна</dt>
+                                    <dd>{{ product.country|raw }}</dd>
+                                </div>
+                            {% endif %}
+
+                            {% if product.manufacturer %}
+                                <div class="col-6">
+                                    <dt>Производитель</dt>
+                                    <dd>{{ product.manufacturer|raw }}</dd>
+                                </div>
+                            {% endif %}
+
+                            {% if product.field3 %}
+                                <div class="col-6">
+                                    <dt>Коллекция</dt>
+                                    <dd>{{ product.field3|raw }}</dd>
+                                </div>
+                            {% endif %}
+
+                            {% for attribute in product.getAttributes().whereNotIn('address', ['tovar-po-akcii', 'dveri-pod-zakaz']) %}
+                                <div class="col-6 ">
+                                    <dt>{{ attribute.title }}</dt>
+                                    <dd>{{ attribute.value == '1' ? 'Да' : attribute.value }}</dd>
+                                </div>
+                            {% endfor %}
+                        </dl>
+                    </div>
+                </div>
+
+                {% if product.hasRelations() %}
+                    <nav class="mt-3">
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-item nav-link active" data-toggle="tab" href="#nav-single">Полотно</a>
+                            <a class="nav-item nav-link" data-toggle="tab" href="#nav-group">Комплект</a>
+                        </div>
+                    </nav>
+                {% endif %}
+
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-single" data-catalog-item>
+                        <div class="row mt-3 cennik">
+                            {% if (product.field2 or category.field3) %}
+                                <div class="col-12 mb-4">
+                                    <div class="dropdown">
+                                        <span class="dropdown__label">Размер блока</span>
+                                        <select class="dropdown__select" name="size" data-catalog-item-attr="size">
+                                            {% for size in (product.field2 ? product.field2 : category.field3)|split(',') %}
+                                                <option value="{{ size }}" {{ loop.index == 1 ? 'selected' }}>{{ size }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="col-12 mb-4 mb-md-0">
+                                <span style="font-size: 10px">Стоимость: </span>
+                                <p class="my-0" style="font-size: 31px">{{ product.price|number_format(0, '.', ' ') }} руб.</p>
+                            </div>
+
+
+
+
+                            <div class="col-12 col-md-6 offset-md-6">
+                                <button class="btn btn_dark btn_animation product-card__add-to-favorites" data-click="favorite" data-favorite-product="{{ product.uuid }}"  >
+                                    <div class="btn__border btn__border_lr">
+                                        <div class="btn__border btn__border_tb"></div>
+                                    </div>
+                                    <span>В избранное</span>
+                                </button>
+                            </div>
+
+
+
+
+                            <div class="col-12 col-md-6 offset-md-6">
+                                <a href="javascript:;" class="product-card__btn btn btn_dark btn_animation" data-catalog-item-add  >
+                                    <div class="btn__border btn__border_lr">
+                                        <div class="btn__border btn__border_tb"></div>
+                                    </div>
+                                    <span>В корзину</span>
+                                </a>
+                            </div>
+                            <div class="col-12 col-md-6 offset-md-6" >
+                                <a href="javascript:;" class="product-card__btn btn btn_dark btn_animation" data-toggle="modal" data-target="#order-measure"  >
+                                    <div class="btn__border btn__border_lr">
+                                        <div class="btn__border btn__border_tb"></div>
+                                    </div>
+                                    <span>Вызвать замерщика</span>
+                                </a>
+                            </div>
+
+                            {# include product options #}
+                            {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+                        </div>
+                    </div>
+
+                    {% if product.hasRelations() %}
+                        <div class="tab-pane fade" id="nav-group">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60%!important;">Наименование</th>
+                                        <th style="width: 5%!important;word-break: keep-all;">Кол-во</th>
+                                        <th style="width: 15%!important;">Цена</th>
+                                        <th style="width: 15%!important;">Сумма</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set sum = product.price %}
+                                    <tr>
+                                        <td style="width: 60%!important;">{{ product.title }}</td>
+                                        <td style="width: 5%!important;" class="text-center">1</td>
+                                        <td style="width: 15%!important;" class="text-right text-nowrap">{{ product.price|number_format(0, '.', ' ') }}</td>
+                                        <td style="width: 15%!important;" class="text-right text-nowrap">{{ product.price|number_format(0, '.', ' ') }}</td>
+                                    </tr>
+                                    {% for prod in product.getRelations() %}
+                                        {% set sum = sum + (prod.related.price * prod.count) %}
+                                        <tr data-catalog-item>
+                                            <td style="width: 60%!important;">
+                                                {{ prod.related.title }}
+
+                                                {# include product options #}
+                                                {% include 'catalog.product.options.twig' with {'categories': categories, 'product': prod.related, 'quantity': prod.count } only %}
+                                            </td>
+                                            <td style="width: 5%!important;" class="text-center">{{ prod.count }}</td>
+                                            <td style="width: 15%!important;" class="text-right text-nowrap">{{ prod.related.price|number_format(0, '.', ' ') }}</td>
+                                            <td style="width: 15%!important;" class="text-right text-nowrap">{{ (prod.related.price * prod.count)|number_format(0, '.', ' ') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <div class="row mt-4 cennik">
+                                {% if (product.field2  or category.field3) %}
+                                    <div class="col-12 mb-3">
+                                        <div class="dropdown">
+                                            <span class="dropdown__label">Размер блока</span>
+                                            <select class="dropdown__select" name="size" data-catalog-item-attr="size">
+                                                {% for size in (product.field2 ? product.field2 : category.field3)|split(',') %}
+                                                    <option value="{{ size }}" {{ loop.index == 1 ? 'selected' }}>{{ size }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <div class="col-12 col-md-4">
+                                    <span style="font-size: 10px">Стоимость: </span>
+                                    <p class="my-0" style="font-size: 31px">{{ sum|number_format(0, '.', ' ') }} руб.</p>
+                                </div>
+
+
+                                <div class="col-12 col-md-4">
+                                    <a href="javascript:;" class="product-card__btn btn btn_dark btn_animation" data-catalog-item-add-group>
+                                        <div class="btn__border btn__border_lr">
+                                            <div class="btn__border btn__border_tb"></div>
+                                        </div>
+                                        <span>В корзину</span>
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <a href="javascript:;" class="product-card__btn btn btn_dark btn_animation" data-toggle="modal" data-target="#order-measure">
+                                        <div class="btn__border btn__border_lr">
+                                            <div class="btn__border btn__border_tb"></div>
+                                        </div>
+                                        <span>Вызвать замерщика</span>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if product.field1 is not empty %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="py-4">Другие цвета:</h4>
+
+                            {% for variant in united_product(product.field1) %}
+                                <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ variant.address }}" style="text-decoration:none!important; display:inline-block; margin: 0 3px 3px 0; {{ current_path() ends with variant.address ? 'border: 5px solid #42424152;' }}" >
+                                    <img src="{{ variant.hasFiles() ? variant.getFiles().first().getPublicPath('middle') : '/assets/img/no_image.png' }}" alt="{{ variant.title }}" style="display:inline-block; height: 100px; width: 100px; object-fit: contain; object-position: center center;">
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row text-center my-0 my-md-5 py-4">
+            <div class="col-6 col-md-3 my-3">
+
+                <img src="/resource/img/oplata.svg" width="100">
+                <h3 class="my-4">ОПЛАТА</h3>
+                <p>Оплата при получении наличными или картой</p>
+            </div>
+            <div class="col-6 col-md-3 my-3">
+                <img src="/resource/img/dostavka.svg" width="100">
+                <h3 class="my-4">ДОСТАВКА</h3>
+                <p>При заказе мы доставим вам двери в пределах Башкортостана или самовывоз</p>
+            </div>
+            <div class="col-6 col-md-3 my-3">
+                <img src="/resource/img/ustanovka.svg" width="100">
+                <h3 class="my-4">УСТАНОВКА</h3>
+                <p>Качественная установка с гарантией</p>
+            </div>
+            <div class="col-6 col-md-3 my-3">
+                <img src="/resource/img/kredit.svg" width="100">
+                <h3 class="my-4">ГАРАНТИЯ</h3>
+                <p>Возможно приобретение в кредит</p>
+            </div>
+        </div>
+
+        {% include 'catalog.product.list.twig' %}
+        {% include 'catalog.product.viewed.twig' %}
+    </div>
+{% endblock %}

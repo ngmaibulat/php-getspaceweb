@@ -1,0 +1,76 @@
+{% extends 'main.twig' %}
+
+{% block title %}Поиск | {{ parent() }}{% endblock %}
+
+{% block page %}
+    <div class="container">
+        <div class="site-pagination">
+            <a href="/">Главная</a> /
+            <a href="/search">Поиск по сайту</a>
+        </div>
+
+        <h1>Поиск по сайту</h1>
+
+        <section class="products-catalog favorites-list">
+            <div class="products-catalog__container">
+                <div class="products-catalog__row" data-parent="true" style="position: relative;">
+                    <div class="products-catalog__col">
+                        <div class="js-catalog-items">
+                            <div class="products-catalog__list" data-favorite-list>
+                                {% if (_request.q or _request.query) %}
+                                    {% if count %}
+                                        {% for type, list in result %}
+                                            {% if type == 'catalog_product' %}
+                                                {% for product in list %}
+                                                    <div class="product-card col-12 col-sm-6 col-md-4" data-catalog-item>
+                                                        <div class="product-card__image-wrap">
+                                                            <a class="merch merch_solid" href="/{{ product.address }}">
+                                                                {% include 'mixin/image.twig' with {
+                                                                    'src': product.files[0].middle,
+                                                                    'title': product.title,
+                                                                    'alt': product.title,
+                                                                    'style': 'display:block; height: 100%; width: auto; object-fit: contain; object-position: center center;'
+                                                                } only %}
+                                                            </a>
+                                                        </div>
+                                                        <div class="product-card__desc">
+                                                            <div class="product-card__row">
+                                                                <h4 class="product-card__title">{{ product.title }}</h4>
+
+                                                            </div>
+                                                            <div class="product-card__color"></div>
+                                                            <div class="product-card__price-wrap">
+                                                                <div class="product-card__price product-card__price_actual text-center">
+                                                                    {{ product.price|number_format(0 , '.', ' ') }} руб.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <a href="/{{ product.address }}" class="product-card__btn btn btn_dark btn_animation">
+                                                            <div class="btn__border btn__border_lr">
+                                                                <div class="btn__border btn__border_tb"></div>
+                                                            </div>
+                                                            <span>Подробнее</span>
+                                                        </a>
+                                                        {# include product options #}
+                                                        {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="row mt-5">
+                                            <div class="col-12 text-center">
+                                                <h4>Ничего нет</h4>
+                                                <p>Попробуйте изменить запрос</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'main.twig' %}
+
+{% block title %}Заказ {{ order.serial }} {{ order.external_id ? '(' ~ order.external_id ~ ')' : '' }} | {{ parent() }}{% endblock %}
+
+{% block page %}
+    <script>
+        window.catalog = {
+            events: {
+                'on:ready': (data, cart, obj) => {
+                    obj.cartRemoveAllProducts();
+                }
+            }
+        }
+    </script>
+
+    <div class="page-top-info">
+        <div class="container pb-0">
+            <h4>Заказ</h4>
+            <div class="site-pagination">
+                <a href="/">Главная</a> /
+                <a href="/{{ parameter('catalog_address', 'catalog') }}">Каталог</a> /
+                <a href="/cart">Корзина</a> /
+                <a href="/cart/done/{{ order.uuid }}">Заказ</a>
+            </div>
+        </div>
+    </div>
+
+    <section class="">
+        <div class="container">
+            <div class="row pb-5">
+                <div class="col-md-12 text-center">
+                    <h3 class="pb-3">
+                        Информация о заказе {{ order.external_id ? order.external_id : order.serial }}
+                    </h3>
+                    <p>Благодарим вас за заказ</p>
+                </div>
+            </div>
+
+            <div class="row pb-5">
+                <div class="col-md-6">
+                    <h4>Заказчик</h4>
+
+                    <table class="table mt-3 mb-5">
+                        <tr>
+                            <td style="width: 50%">Имя</td>
+                            <td style="width: 50%">{{ order.user ? order.user.getName() : order.delivery.client }}</td>
+                        </tr>
+                        <tr>
+                            <td>Телефон</td>
+                            <td>{{ order.user and order.user.phone ? order.user.phone : order.phone }}</td>
+                        </tr>
+                        <tr>
+                            <td>E-Mail</td>
+                            <td>{{ order.user and order.user.email ? order.user.email : order.email }}</td>
+                        </tr>
+                        <tr>
+                            <td>Адрес доставки</td>
+                            <td>{{ order.delivery.address }}</td>
+                        </tr>
+                        <tr>
+                            <td>Дата заявки</td>
+                            <td>{{ order.shipping|df('d.m.Y H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Комментарий</td>
+                            <td>{{ order.comment }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h4>Состав заказа</h4>
+
+                    <table class="table mt-3 mb-5" style="width: 100%;">
+                        <tr style="font-weight: bold" >
+                            <td style="width: 80%">Название</td>
+                            <td>Кол-во</td>
+                            <td>Цена</td>
+                            <td>Сумма</td>
+                        </tr>
+
+                        {% set sum = 0 %}
+                        {% for product in products %}
+                            {% set sum = sum + (product.price * order.list[product.uuid.toString()]) %}
+                            <tr  style="border-bottom: #1b1e21 dotted 1px">
+                                <td>{{ product.title }}</td>
+                                <td style="text-align: right">{{ order.list[product.uuid.toString()] }}</td>
+                                <td style="text-align: right">{{ product.price|number_format(2, '.', '') }}</td>
+                                <td style="text-align: right">{{ (product.price * order.list[product.uuid.toString()])|number_format(2, '.', '') }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        <tr style="border-top: 1px solid #000; font-weight: bold">
+                            <td colspan="3">Итого</td>
+                            <td style="text-align: right">{{ sum|format_number({fraction_digit: 2}) }}р.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

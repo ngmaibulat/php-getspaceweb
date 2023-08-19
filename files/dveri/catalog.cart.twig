@@ -1,0 +1,239 @@
+{% extends 'main.twig' %}
+
+{% block title %}{{ category.meta.title ? category.meta.title : (category.title ?? 'Каталог') }} | {{ parent() }}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+    <meta name="description" content="{{ category.meta.description ? category.meta.description : (category.meta.title ? category.meta.title : 'Каталог дверей') }}">
+{% endblock %}
+
+{% block page %}
+    <script>
+        window.catalog = {
+            cart: {
+                columns: [
+                    {label: '',             attr: 'thumb',          view: null, class: 'favorites__table-cell', style: 'width: 10%; text-align: center;'},
+                    {label: 'Наименование', attr: 'url',            view: null, class: 'favorites__table-cell', style: null},
+
+                    {label: 'Количество',   attr: 'quantity',       view: null, class: 'favorites__table-cell', style: 'width: 15%;'},
+                    {label: 'Стоимость',    attr: 'price',          view: null, class: 'favorites__table-cell', style: 'text-align: right;'},
+                    {label: 'Всего',        attr: 'total',          view: null, class: 'favorites__table-cell', style: 'text-align: right;'},
+                    {label: 'Убрать',       attr: 'remove',         view: null, class: 'favorites__table-cell', style: 'text-align: center;'},
+                ],
+                style: 'div',
+                class: 'favorites__table',
+                price_precision: 5,
+                count_precision: 3,
+            },
+            events: {
+                'on:ready': (data, cart, obj) => {
+                    $('[data-cart-not-empty]').toggle(!!obj.cartCount());
+                    $('[data-cart-empty]').toggle(!obj.cartCount());
+
+                    let comment = '';
+                    for (let item of data) {
+                        if (item.size) {
+                            comment += item.title + ' размер блока ' + item.size + "\r\n";
+                        }
+                    }
+                    $('[name="comment"]').val(comment);
+                },
+                'on:cart:update': (data, cart, obj) => {
+                    $('[data-cart-not-empty]').toggle(!!obj.cartCount());
+                    $('[data-cart-empty]').toggle(!obj.cartCount());
+                },
+                'on:cart:add': (data) => {
+                    Swal.fire('Корзина обновлена', data.title + ' (*' + data.quantity + ') теперь в корзине.', 'success');
+                },
+                'on:cart:checkout:before': () => {
+                    let $btn = $('[data-catalog-cart-checkout] span').html('<div class="spinner-border" style="width: 15px; height: 15px"><span class="sr-only">Loading...</span></div>');
+
+                    setTimeout(() => {$btn.text('Заказать');}, 7 * 1000);
+                }
+            }
+        }
+    </script>
+    <style>
+        [data-group], .favorites__table-cell {
+            text-align: center;
+            padding: 10px 0;
+            text-transform: uppercase;
+        }
+        .favorites__table-cell {
+            padding: 40px 20px;
+        }
+
+        [data-type="product"] {
+            font-size: 18px!important;
+            border: solid 1px #ddd;
+            margin-bottom: 3px;
+        }
+
+        [data-attr="thumb"] img {
+            height: 118px;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        [data-attr="quantity"] input {
+            background: 0;
+            font-size: 14px;
+            line-height: 18px;
+            color: #464646;
+            margin-right: 1px;
+            text-align: center;
+            padding: 0;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            appearance: none;
+            width: 100%;
+            height: 38px;
+        }
+
+        [data-attr="remove"] button {
+            height: 38px;
+            width: 38px;
+            margin: 0 auto;
+        }
+
+        @media screen and (max-width: 1024px) {
+            [data-catalog-cart] .row:first-child {
+                display: none;
+            }
+
+            [data-catalog-cart] [data-attr="thumb"],
+            [data-catalog-cart] [data-attr="price"] {
+                display: none;
+            }
+        }
+    </style>
+
+    {% set aside = current_path() ends with '/' ~ parameter('catalog_address', 'catalog') %}
+    {% set subcats = categories.where('parent', '=', '00000000-0000-0000-0000-000000000000').sortBy('order') %}
+    {% if category != null %}
+        {% set subcats = categories.where('parent', '=', category.uuid) %}
+    {% endif %}
+
+    <section class="cabinet">
+        <div class="cabinet__container">
+            <div class="cabinet__head">
+                <h2 class="cabinet__title">Корзина</h2>
+                <h2 class="cabinet__title cabinet__title_mobile">Корзина</h2>
+            </div>
+
+            <div class="cabinet__content">
+                <div class="row pt-5 pb-5" style="display: none" data-cart-empty>
+                    <div class="col-md-12 text-center">
+                        <h3 class="pb-3">Пустая корзина</h3>
+                        <p>Двери в нашем   <a href="/{{ parameter('catalog_address', 'catalog') }}" style="text-decoration: underline">каталоге</a></p>
+                    </div>
+                </div>
+
+                <div class="cabinet__content-item active" data-cart-not-empty>
+                    <div class="favorites">
+                        <div data-catalog-cart></div>
+
+
+                        <div class="favorites__total-col">
+                            <div class="favorites__total-result">
+                                Итого на сумму:
+                                <span class="favorites__total-value text-nowrap">
+                                                    <span class="js-cart-old-total"     data-catalog-cart-total>0</span> ₽
+                                                </span>
+                            </div>
+                        </div>
+
+                        <div class="contact-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div>
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'text',
+                                            'name': 'delivery[client]',
+                                            'args': {
+                                                'value': user.getName(),
+                                                'required': true,
+                                                'placeholder': 'Ваше имя *',
+                                                'class': ['form-control'],
+                                                'data': {'catalog-cart-data': ''}
+                                            }
+                                        } %}
+                                    </div>
+                                    <div>
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'tel',
+                                            'name': 'phone',
+                                            'args': {
+                                                'value': user.getPhone(),
+                                                'required': true,
+                                                'placeholder': 'Ваш телефон *',
+                                                'class': ['form-control'],
+                                                'data': {'catalog-cart-data': ''}
+                                            }
+                                        } %}
+                                    </div>
+                                    <div>
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'email',
+                                            'name': 'email',
+                                            'args': {
+                                                'value': user.getEmail(),
+                                                'placeholder': 'Ваш E-Mail',
+                                                'class': ['form-control'],
+                                                'data': {'catalog-cart-data': ''}
+                                            }
+                                        } %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div>
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'textarea',
+                                            'name': 'delivery[address]',
+                                            'args': {
+                                                'value': user.getAddress(),
+                                                'required': true,
+                                                'placeholder': 'Адрес доставки.. *',
+                                                'style': 'height: 105px; margin-bottom: 16px;',
+                                                'class': ['form-control'],
+                                                'data': {'catalog-cart-data': ''}
+                                            }
+                                        } %}
+                                    </div>
+                                    <div>
+                                        {% include 'mixin/form.twig' with {
+                                            'type': 'textarea',
+                                            'name': 'comment',
+                                            'args': {
+                                                'placeholder': 'Комментарий',
+                                                'style': 'height: 70px; margin-bottom: 16px;',
+                                                'class': ['form-control'],
+                                                'data': {'catalog-cart-data': ''}
+                                            }
+                                        } %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 order-1 order-md-0">
+                                    <div class="favorites__total js-cart-total-block">
+
+                                        <div class="favorites__total-col">
+                                            <a href="#" data-catalog-cart-checkout class="btn btn_dark btn_animation favorites__order">
+                                                <div class="btn__border btn__border_lr">
+                                                    <div class="btn__border btn__border_tb"></div>
+                                                </div>
+                                                <span>Заказать</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

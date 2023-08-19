@@ -1,0 +1,26 @@
+{% set uuids = catalog_product_view() %}
+
+{% if uuids %}
+    {% set viewed = catalog_product(uuids) %}
+
+    <!-- VIEWED PRODUCTS section -->
+    <div class="row pt-5 mt-5">
+        <div class="col-12">
+            <div class="section-title">
+                <h2>Просмотренные двери</h2>
+            </div>
+
+            <div class="row">
+                {% for item in viewed %}
+                    {% include 'catalog.category.product.twig' with { 'product':item } only %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- VIEWED PRODUCTS section end -->
+{% endif %}
+
+{% if product is not empty %}
+    {# save viewed product #}
+    {{ catalog_product_view(product.uuid,6) }}
+{% endif %}

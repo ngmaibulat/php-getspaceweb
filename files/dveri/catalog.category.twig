@@ -1,0 +1,142 @@
+{% extends 'main.twig' %}
+
+{% block title %}{{ category.meta.title ? category.meta.title : (category.title ?? 'Каталог') }} | {{ parent() }}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <meta name="description" content="{{ category.meta.description }}">
+    <meta name="keywords" content="{{ category.meta.keywords }}">
+{% endblock %}
+
+{% block page %}
+    {% if categories is null %}
+        {% set categories = catalog_category() %}
+    {% endif %}
+    {% set subcats = categories.where('parent', '=', '00000000-0000-0000-0000-000000000000').sortBy('order') %}
+    {% if category != null %}
+        {% set subcats = categories.where('parent', '=', category.uuid) %}
+    {% endif %}
+
+    <div class="container">
+        <div class="site-pagination">
+            <a href="/">Главная</a> /
+            <a href="/{{ parameter('catalog_address', 'catalog') }}">Каталог</a>
+            {% for breadcrumb in catalog_category_parents(category) %}
+                / <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ breadcrumb.address }}">{{ breadcrumb.meta.title ? breadcrumb.meta.title : breadcrumb.title }}</a>
+            {% endfor %}
+        </div>
+
+        {% if subcats|count and _request['tovar-po-akcii'] == null and _request['dveri-pod-zakaz'] == null %}
+            <h2>Каталог дверей в Уфе</h2>
+
+            <div class="container">
+                <div class="text-block">
+                    <div class="text-block__marked">
+                        Создайте интерьер с нами.<br> Выберите двери, а&nbsp;мы предложим функциональные решения в&nbsp;едином стиле. Завершить образ помогут аксессуары.
+                    </div>
+                </div>
+                <div class="collection">
+                    {% for subcat in subcats.whereIn('uuid', ['1e7004cc-19e7-432e-860d-95bdb16004b2', '502c3d3a-fce8-4f51-bb7f-05a594c9229b', 'c158ff67-63f1-4a94-a657-da0ab1eaa096']) %}
+                        {% include 'catalog.category.subcat.twig' with {'categories':categories,'subcat':subcat,'products':products} only %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+
+            {% if subcats|count and _request['tovar-po-akcii'] != null %}
+                <h1>Акция</h1>
+                <div class="text-block">
+                    <div class="text-block__text">
+                       Двери по акции. Успей купить со скидкой!
+                    </div>
+                </div>
+            {% elseif subcats|count and _request['dveri-pod-zakaz'] != null %}
+                <h1>Под заказ</h1>
+                <div class="text-block">
+                    <div class="text-block__text">
+                       Двери по индивидуальным критериям!
+                    </div>
+                </div>
+            {% else %}
+                <h1>{{ category.title }}</h1>
+            {% endif %}
+
+
+
+            <section class="products-catalog">
+                <div class="products-catalog__container">
+                    <div class="products-catalog__row d-flex flex-wrap" data-parent="true" style="position: relative;">
+                        {% if category != null or (_request['tovar-po-akcii'] == null and _request['dveri-pod-zakaz'] == null) %}
+                            <div class="products-catalog__filters js-catalog-filter order-first">
+                                <div class="products-catalog__filters-inner" style="position: relative;">
+                                    {% include 'catalog.category.filter.twig' %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="products-catalog__col order-0 ">
+                            <div class="products-catalog__sort">
+                                <div class="dropdown">
+                                    <span class="dropdown__label">Сортировать по</span>
+                                    <select class="dropdown__select" id="catalog-sort">
+                                        <option value="title_asc" data-order="title" data-direction="asc" {{ ((_request['order'] == 'title' and _request['direction'] == 'asc' or products.params.order.title == 'asc') ? 'selected') }}>
+                                            по названию (а - я)
+                                        </option>
+                                        <option value="title_desc" data-order="title" data-direction="desc" {{ ((_request['order'] == 'title' and _request['direction'] == 'desc' or products.params.order.title == 'desc') ? 'selected') }}>
+                                            по названию (я - а)
+                                        </option>
+                                        <option value="price_asc" data-order="price" data-direction="asc" {{ ((_request['order'] == 'price' and _request['direction'] == 'asc' or products.params.order.price == 'asc') ? 'selected') }}>
+                                            по цене (по возрастанию)
+                                        </option>
+                                        <option value="price_desc" data-order="price" data-direction="desc" {{ ((_request['order'] == 'price' and _request['direction'] == 'desc' or products.params.order.price == 'desc') ? 'selected') }}>
+                                            по цене (по убыванию)
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="js-catalog-items">
+
+                                <div class="products-catalog__list d-flex flex-wrap justify-content-around">
+                                    {% if products.filtered.count() %}
+                                        {% for product in products.filtered %}
+                                            {% include 'catalog.category.product.twig' with { 'categories':categories, 'product':product, 'category':category } only %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="col-12 text-center">
+                                            <h4>Таких товаров нет, увы</h4>
+                                            <p>
+                                                Попробуйте смягчить условия поиска — то, что вам нужно, наверняка найдётся.
+                                            </p>
+                                            <a href="{{ non_page_path() }}{{ page ? '/' ~ page : '' }}" class="btn btn_dark btn_animation favorites__order">
+                                                <div class="btn__border btn__border_lr">
+                                                    <div class="btn__border btn__border_tb"></div>
+                                                </div>
+                                                <span>Сбросить фильтры</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% include 'pagination.twig' with { 'pagination': pagination } only %}
+                            </div>
+                        </div>
+                        <div dir="ltr" class="resize-sensor" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                            <div class="resize-sensor-expand" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                                <div style="position: absolute; left: 0px; top: 0px; transition: all 0s ease 0s; width: 1210px; height: 4625px;"></div>
+                            </div>
+                            <div class="resize-sensor-shrink" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                                <div style="position: absolute; left: 0px; top: 0px; transition: all 0s ease 0s; width: 200%; height: 200%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-block">
+                <div class="text-block__text">
+                    {{ category.description|raw }}
+                </div>
+            </div>
+
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'main.twig' %}
+
+{% block title %}{{ page.meta.title ? page.meta.title : page.title }} | {{ parent() }}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <meta name="description" content="{{ page.meta.description }}">
+    <meta name="keywords" content="{{ page.meta.keywords }}">
+{% endblock %}
+
+{% block page %}
+    <div class="container">
+        <div class="site-pagination">
+            <a href="/">Главная</a> /
+            <a href="/{{ parameter('catalog_address', 'catalog') }}">Каталог</a> /
+            <a href="/favorites">Избранное</a>
+        </div>
+
+        <h1>Избранное</h1>
+
+        <section class="products-catalog favorites-list">
+            <div class="products-catalog__container">
+                <h4 class="favorites-empty text-center">Тут пока ничего нет</h4>
+
+                <div class="products-catalog__row" data-parent="true" style="position: relative;">
+                    <div class="products-catalog__col">
+                        <div class="js-catalog-items">
+                            <div class="products-catalog__list" data-favorite-list>
+
+                                <div class="product-card" data-favorite>
+                                    <div class="product-card__image-wrap">
+                                        <div data-favorite-attr="thumb" style="width: 100%; height: 100%; background-position: center center; background-size: contain; background-repeat: no-repeat;"></div>
+                                    </div>
+                                    <div class="product-card__desc">
+                                        <div class="product-card__row">
+                                            <h4 class="product-card__title" data-favorite-attr="title"></h4>
+                                        </div>
+
+                                        {% for colors in products %}
+                                            <div class="product-card__color">{{ colors.title }}</div>
+                                        {% endfor %}
+
+                                        <div class="product-card__price-wrap">
+                                            <div class="product-card__price product-card__price_actual text-center" data-favorite-attr="price"></div>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="product-card__btn btn btn_dark btn_animation" data-favorite-attr="url">
+                                        <div class="btn__border btn__border_lr">
+                                            <div class="btn__border btn__border_tb"></div>
+                                        </div>
+                                        <span>Перейти</span>
+                                    </a>
+
+                                    {# include product options #}
+                                    {% include 'catalog.product.options.twig' with {'categories': categories, 'product': product} only %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div dir="ltr" class="resize-sensor" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                        <div class="resize-sensor-expand" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                            <div style="position: absolute; left: 0px; top: 0px; transition: all 0s ease 0s; width: 1210px; height: 4625px;"></div>
+                        </div>
+                        <div class="resize-sensor-shrink" style="pointer-events: none; position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden; max-width: 100%;">
+                            <div style="position: absolute; left: 0px; top: 0px; transition: all 0s ease 0s; width: 200%; height: 200%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let storage = JSON.parse(localStorage.getItem('favorites') || '[]'),
+                $view = $('.favorites-list'),
+                $empty = $view.find('.favorites-empty'),
+                $list = $view.find('[data-favorite-list]'),
+                $list_item = $list.find('[data-favorite]').detach();
+
+            function render(storage) {
+                $list.html('');
+
+                if (storage && storage.length) {
+                    $empty.hide();
+
+                    for (let item of storage) {
+                        let $buf = $list_item.clone();
+
+                        $buf.find('[data-favorite-attr="url"]').attr('href', item.url);
+                        $buf.find('[data-favorite-attr="thumb"]').css({'background-image': 'url(' + item.thumb + ')'});
+                        $buf.find('[data-favorite-attr="title"]').attr('href', item.url).text(item.title);
+                        $buf.find('[data-favorite-attr="price"]').text(item.price + ' руб');
+
+                        $buf.appendTo($list);
+                    }
+                } else {
+                    $empty.show();
+                }
+            }
+            render(storage);
+        });
+    </script>
+{% endblock %}

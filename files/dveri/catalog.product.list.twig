@@ -1,0 +1,46 @@
+{# ТОЛЬКО ДЛЯ ВХОДНЫХ ДВЕРЕЙ #}
+{% if category.uuid == '502c3d3a-fce8-4f51-bb7f-05a594c9229b' and product.hasAttributes() %}
+    {% for attribute in product.getAttributes() %}
+        {% if attribute.attribute.address == 'naznachenie-dveri' %}
+            {% set list = attribute.getAttribute().getProductAttributes().where('value', attribute.value) %}
+
+            {% if list|count >= 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>Другие {{ attribute.value }}</h2>
+                        </div>
+
+                        <div class="row">
+                            {% for el in list %}
+                                {% set item = el.getProduct() %}
+                                {% if (item.field1 == '' or item.field1 != product.field1) and item.uuid != product.uuid %}
+                                    {% include 'catalog.category.product.twig' with { 'product':item } only %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# ТОЛЬКО ДЛЯ МЕЖКОМНАТНЫХ ДВЕРЕЙ #}
+{% if category.uuid == '1e7004cc-19e7-432e-860d-95bdb16004b2' %}
+    {#{% set list = catalog_products(category.uuid, {'date': 'desc'}, 20).where('field1', '!=', product.field1) %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="section-title">
+                <h2>Другие двери</h2>
+            </div>
+
+            <div class="row">
+                {% for item in list.random(6) %}
+                    {% include 'catalog.category.product.twig' with { 'product':item } only %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>#}
+{% endif %}

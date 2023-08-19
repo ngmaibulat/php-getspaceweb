@@ -1,0 +1,30 @@
+{#
+title - заголовок
+description - описание
+url - ссылка переход
+src - картинка
+srcmob - картинка для телефона
+#}
+<div class="parallax parallax_choice parallax_margin">
+    <div class="wide">
+        <div class="title title_light">
+            <div class="title__main">{{ title }}</div>
+            <div class="title__sub">{{ description }}</div>
+        </div>
+        <a href="{{ url }}" class="btn btn_light btn_animation">
+            <div class="btn__border btn__border_lr">
+                <div class="btn__border btn__border_tb"></div>
+            </div>
+            <span>Узнать больше</span>
+        </a>
+        <div class="parallax__image-wrap js-optimized-bg js-parallax-bg" style="background-image: url({{ src }});">
+            <noscript>
+                {% include 'mixin/image.twig' with {
+                    'src': src,
+                    'alt': title,
+                    'class': 'd-none d-md-block',
+                } only %}
+            </noscript>
+        </div>
+    </div>
+</div>

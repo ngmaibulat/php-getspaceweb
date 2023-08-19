@@ -1,0 +1,13 @@
+{% set category = categories.firstWhere('uuid', item.category) %}
+
+<div class="row">
+    <article class="publication" data-uuid="{{ item.uuid }}">
+        <h2><a href="/{{ item.address }}">{{ item.title }}</a></h2>
+        <div>
+
+        </div>
+        <div>
+            {{ item.content.short|raw }}
+        </div>
+    </article>
+</div>

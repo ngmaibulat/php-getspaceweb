@@ -1,0 +1,150 @@
+<header class="header header__main">
+    <div class="header__container">
+        <div class="header__primary">
+            <div class="header__basis">
+                <div class="header__logo">
+                    <a href="/" class="header__logo-link">
+                        <img src="/resource/img/favicon.png" width="30" class="header__logo rounded">
+                    </a>
+                </div>
+                {# <div class="header__city-preference city-preference js-city-preference" style="">
+                    <div class="city-preference__variants">
+                        <div class="city-choice js-btn-link" data-src="#city-fancybox-form">
+                            <div class="city-choice__select js-btn-link-link">
+                                <a href="/" class="js-city-choice-select">Уфа</a>
+                            </div>
+                        </div>
+                    </div>
+                </div> #}
+            </div>
+
+            <div class="header__panel">
+                <div class="main-menu">
+                    <div class="main-menu__item">
+                        <a href="/catalog/" class="main-menu__link main-menu__link_switcher js-main-menu-switcher">Каталог</a>
+                        <button class="main-menu__switcher js-main-menu-switcher">
+                            <svg class="icon">
+                                <use xlink:href="/resource/img/symbol-sprite.svg#icon-drop"></use>
+                            </svg>
+                        </button>
+                        <ul class="main-menu__dropdown js-main-menu-dropdown">
+                            {% for category in catalog_category()   %}
+                                <li class="main-menu__dropdown-item">
+                                    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ category.address }}">{{ category.title }}</a>
+                                </li>
+                            {% endfor %}
+
+
+
+                        </ul>
+                    </div>
+
+                    <div class="main-menu__item">
+                        <a href="#" class="main-menu__link" data-toggle="modal" data-target="#order-measure">
+                            Заказать звонок
+
+                        </a>
+                    </div><!--end .main-menu__item; -->
+
+
+                    <div class="main-menu__item">
+                        <a href="/catalog?tovar-po-akcii=1" class="main-menu__link">Двери по акции</a>
+                    </div><!--end .main-menu__item; -->
+                </div>
+
+                <a href="#" class="header__nav-button js-nav-button">
+                    <div href="#" class="icon-link icon-link_nav-button nav-button__link">
+                        <div class="icon-link__border icon-link__border_lr">
+                            <div class="icon-link__border icon-link__border_tb"></div>
+                        </div>
+                        <svg class="icon">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-menu_hamburger"></use>
+                        </svg>
+                    </div>
+                    <div class="nav-button__link nav-button__link_close">
+                        <svg class="icon">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-close"></use>
+                        </svg>
+                    </div>
+                </a>
+
+                {% include 'header.menu.twig' %}
+            </div>
+        </div>
+        <div class="header__secondary">
+            <div class="header__actions">
+                <div class="header__action">
+                    <a href="/cart" class="icon-link">
+                        <div class="icon-link__border icon-link__border_lr">
+                            <div class="icon-link__border icon-link__border_tb"></div>
+                        </div>
+                        <svg class="icon icon-basket">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-basket"></use>
+                        </svg>
+                    </a>
+                    <span class="header__action-value js-cart-count-block" data-catalog-cart-count>0</span>
+                </div>
+
+                <div class="header__action">
+                    <a href="/favorites" class="icon-link js-favorite-link">
+                        <div class="icon-link__border icon-link__border_lr">
+                            <div class="icon-link__border icon-link__border_tb"></div>
+                        </div>
+                        <svg class="icon">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-favorites"></use>
+                        </svg>
+                    </a>
+                    <span class="header__action-value js-favorite-count" data-favorites-cart-count>0</span>
+                    {% include 'parts/favorites.twig' %}
+                </div>
+
+            </div>
+
+            <div class="header__contacts">
+                <form action="/search" method="get" class="header__contacts-finder finder js-finder">
+                    <input class="finder__field js-finder-field" name="q" value="{{ _request.q }}" type="text" placeholder="Найти...">
+                    <button class="finder__send">
+                        <svg class="icon">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-search2"></use>
+                        </svg>
+                    </button>
+                    <button class="finder__close js-finder-close">
+                        <svg class="icon">
+                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-close"></use>
+                        </svg>
+                    </button>
+                    <button class="finder__open js-finder-open"></button>
+                </form>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        $(".js-finder")
+                            .off('click')
+                            .on('click', '.js-finder-open, .js-finder-close', (e) => {
+                                e.preventDefault();
+                                let t = $(e.delegateTarget);
+
+                                $(e.currentTarget).hasClass('js-finder-open') ? t.addClass('finder_active') : t.removeClass('finder_active')
+                            })
+                            .on('submit', (e) => {
+                                '' === $(e.delegateTarget).find(".js-finder-field").val() && (e.preventDefault(), alert("Введен пустой запрос"))
+                            });
+
+                        if (location.pathname === '/search') {
+                            $(".js-finder .js-finder-open").click();
+                        }
+                    });
+                </script>
+
+                {# <a href="#" data-type="ajax" class="header__contacts-phone-order" data-fancybox="" data-src="/ajax/callBackForm.php" data-filter="#order-callback">Заказать звонок</a> #}
+             <div class="header__contacts-phone d-flex flex-column">
+                 <a href="tel:+79177694879" class="phone">+7 (917) 769-48-79</a>
+                 <a href="tel:+73472669525" class="phone">+7 (347) 266-95-25</a>
+             </div>
+
+                <!--a href="tel:88002004666" class="main-menu__call-link btn-link__link js-btn-link-link">8 (800) 200 46 66</a-->
+                <!--a href="#" class="main-menu__call-btn btn btn-link__btn js-btn-link-btn">Перезвонить мне</a-->
+            </div>
+        </div>
+    </div>
+</header>

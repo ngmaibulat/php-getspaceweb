@@ -1,0 +1,16 @@
+<div class="collection-item">
+    <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ category.address }}" class="collection-item__img">
+        {% include 'mixin/image.twig' with {
+            'src': category.hasFiles() ? category.getFiles().first().getPublicPath('full') : '/assets/img/no_image.png',
+            'title': category.title,
+            'alt': category.title,
+        } only %}
+    </a>
+    <div class="collection-item__info">
+        <div class="collection-item__text">
+            <div class="collection-item__title">{{ category.title }}</div>
+
+        </div>
+
+    </div>
+</div>

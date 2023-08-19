@@ -1,0 +1,27 @@
+{% if products is iterable and products.count() > 1 %}
+    {% include 'mixin/image.twig' with {
+        'src': '/resource/img/action.png',
+        'title': 'Акция',
+        'alt': 'Акция',
+        'class': 'action',
+        'style': 'display: none'
+    } only %}
+{% else %}
+    {% if product.getAttributes().firstWhere('address', 'tovar-po-akcii').value == '1' %}
+        {% include 'mixin/image.twig' with {
+        'src': '/resource/img/action.png',
+        'title': 'Акция',
+        'alt': 'Акция',
+        'class': 'action'
+        } only %}
+    {% endif %}
+
+    {% if product.getAttributes().firstWhere('address', 'dveri-pod-zakaz').value == '1' %}
+        {% include 'mixin/image.twig' with {
+        'src': '/resource/img/zakaz.png',
+        'title': 'Под заказ',
+        'alt': 'Под заказ',
+        'class': 'action'
+        } only %}
+    {% endif %}
+{% endif %}

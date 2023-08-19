@@ -1,0 +1,54 @@
+<div class="col-12 col-xl-9 pb-5 pb-md-1 catalog-area mt-3" data-id="search-area" style="display: none">
+    <h3 class="pb-4">Результаты поиска</h3>
+    <div class="table-responsive">
+        <table class="table table-striped tablesorter">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center align-middle">Наименование</th>
+                    <th scope="col" class="text-center align-middle">Цена</th>
+                    <th scope="col" class="sorter-false" style="width: 110px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="d-flex">
+                        <div class="img-box">
+                            <img class="magnify item_image" src="#" alt="" width="150">
+                        </div>
+                        <div class="w-100 d-flex flex-column justify-content-around">
+                            <div>
+                                <a class="tovari item_name" href="#" target="_blank" itemprop="name"></a>
+                            </div>
+                        </div>
+                        <div class="py-2">
+                            <span class="item_artikul"></span>
+                        </div>
+                    </td>
+                    <td class="price">
+                        <a class="tovari font-weight-bold" href="#" target="_blank">
+                            <span class="item_price"></span>
+                        </a>
+                    </td>
+                    <td class="d-flex flex-wrap justify-content-end align-items-end  form-group">
+                        <input class="item_quantity inp text-center form-control w-100" type="number" value="1" min="0" max="">
+                        <span class="item_id item_product" style="display: none;"></span>
+                        <span class="item_pagelink" style="display: none;"></span>
+                        <a class="btn btn-sm btn-success transition-3d-hover rounded item_add text-white w-100 mt-2 d-flex justify-content-center flex-column">
+                            <i class="fas fa-cart-plus"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <style>
+        .pagination { display: block; width: 100%; }
+        .active-pagination { font-weight: bold; font-size: large; padding: 0 5px; }
+        .badge { display: inline-block; margin: 5px; }
+    </style>
+    <div class="pagination flex-m flex-w p-r-50" style="max-width: 100%;">
+        <a href="#" class="badge badge-warning mr-2 p-2 item-pagination flex-c-m trans-0-4">#</a>
+    </div>
+</div>

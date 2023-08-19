@@ -1,0 +1,79 @@
+<a class="btn btn_dark btn_animation favorites__order d-block d-md-none" data-toggle="collapse" href="#collapseFilter">
+    <div class="btn__border btn__border_lr">
+        <div class="btn__border btn__border_tb"></div>
+    </div>
+    <span>Показать фильтры</span>
+</a>
+
+<style>.collapse.show {display: block !important;}</style>
+
+<div class="collapse d-none d-md-block" id="collapseFilter">
+    <h3 class="d-block d-lg-none w-100 text-center">Фильтр</h3>
+
+    <form action="{{ non_page_path() }}" method="get" enctype="text/plain" id="category-filter">
+        <fieldset class="products-catalog__fieldset">
+            <legend class="products-catalog__legend js-spoiler-link">
+                <span class="products-catalog__filter-name">Цена</span>
+            </legend>
+            <div class="products-catalog__fields js-spoiler-box d-none d-md-block">
+                <div>
+                    <span>от</span>
+                    <input type="number" name="price[min]" id="min_price" min="{{ products.all.min('price') }}" max="{{ products.all.max('price') }}" value="{{ products.params.price.min ?? products.all.min('price') }}">
+                </div>
+                <div>
+                    <span>до</span>
+                    <input type="text" name="price[max]" id="max_price" min="{{ products.all.min('price') }}" max="{{ products.all.max('price') }}" value="{{ products.params.price.max ?? products.all.max('price') }}">
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="products-catalog__buttons mb-4 d-none d-md-block">
+            <button class="products-catalog__submit-btn" type="submit" style="display: block;">Показать
+                <span class="products-catalog__span js-count-products"></span></button>
+        </div>
+
+        {% set nested = category.getNested(categories) %}
+        {% for attribute in category.getAttributes() %}
+            {% set values = attribute.getValues(nested) %}
+            {% if values %}
+                <fieldset class="products-catalog__fieldset" data-type="{{ attribute.type }}" data-name="{{ attribute.address }}">
+                    <legend class="products-catalog__legend">
+                        <span class="products-catalog__filter-name">{{ attribute.title }}</span>
+                    </legend>
+
+                    <div class="products-catalog__fields js-spoiler-box d-none d-md-block">
+                        {% for item in values %}
+                            {% set count = attribute
+                                .getProductAttributes()
+                                .where('value', item)
+                                .where('product.status', 'work')
+                                .count() %}
+
+                            {% if item and count %}
+                                <div class="products-catalog__fields-item">
+                                    <input type="checkbox" class="products-catalog__checkbox" name="{{ attribute.address }}{{ attribute.type != 'boolean' ? '[]' }}" value="{{ item }}" id="{{ attribute.address }}-{{ loop.index }}" {{ item in products.params.attributes[attribute.address] ? 'checked' }}>
+                                    <label for="{{ attribute.address }}-{{ loop.index }}" class="products-catalog__label products-catalog__label--colors">
+                                        {{ item == '1' ? 'Да' : item }}
+                                        ({{ (_request[attribute.address] and item not in products.params.attributes[attribute.address] ? '+') ~ count }})
+                                        <svg class="products-catalog__svg" width="20" height="20">
+                                            <use xlink:href="/resource/img/symbol-sprite.svg#icon-checked"></use>
+                                        </svg>
+                                    </label>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            {% endif %}
+        {% endfor %}
+
+        <div class="products-catalog__buttons mb-4 pokazat">
+            <button class="products-catalog__submit-btn" type="submit" style="display: block;">Показать
+                <span class="products-catalog__span js-count-products"></span></button>
+        </div>
+
+        <div class="products-catalog__buttons mt-4">
+            <a href="{{ non_page_path() }}" class="products-catalog__reset-btn">Сбросить фильтр</a>
+        </div>
+    </form>
+</div>

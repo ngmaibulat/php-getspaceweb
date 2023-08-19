@@ -1,0 +1,83 @@
+<div class="header__nav-menu nav-menu js-nav-menu">
+    <div class="nav-menu__inner">
+        <div class="nav-menu__item js-nav-menu-item">
+            <span class="nav-menu__link js-nav-menu-link">Каталог</span>
+            <div class="sub-menu">
+                {% for category in catalog_category().whereIn('uuid', ['1e7004cc-19e7-432e-860d-95bdb16004b2', '502c3d3a-fce8-4f51-bb7f-05a594c9229b', 'c158ff67-63f1-4a94-a657-da0ab1eaa096']) %}
+                    <div class="sub-menu__item">
+                        <a href="/{{ parameter('catalog_address', 'catalog') }}/{{ category.address }}" class="sub-menu__link">{{ category.title }}</a>
+                    </div>
+                {% endfor %}
+
+                <div class="sub-menu__item">
+                    <a href="/otkosy" class="sub-menu__link">Откосы на входные двери</a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="nav-menu__item js-nav-menu-item">
+            <a href="/about/" class="nav-menu__link">О компании</a>
+        </div>
+
+        <div class="nav-menu__item js-nav-menu-item">
+            <a href="/fordisigners/" class="nav-menu__link">Предложение дизайнерам</a>
+        </div>
+
+        <div class="nav-menu__item js-nav-menu-item">
+            <span class="nav-menu__link js-nav-menu-link">Полезная информация</span>
+            <div class="sub-menu">
+                <div class="sub-menu__item">
+                    <a href="/helpfull-info/installation/" class="sub-menu__link">Установка</a>
+                </div>
+                <div class="sub-menu__item">
+                    <a href="/helpfull-info/care/" class="sub-menu__link">Уход за дверями</a>
+                </div>
+                <div class="sub-menu__item">
+                    <a href="/helpfull-info/certificates/" class="sub-menu__link">Сертификаты</a>
+                </div>
+                <div class="sub-menu__item">
+                    <a href="/helpfull-info/warranty/" class="sub-menu__link">Гарантия</a>
+                </div>
+                <div class="sub-menu__item">
+                    <a href="/helpfull-info/support/" class="sub-menu__link">Поддержка клиентов</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="nav-menu__item js-nav-menu-item">
+            <a href="/catalog?tovar-po-akcii=1" class="nav-menu__link">Двери по акции</a>
+        </div>
+        <div class="nav-menu__item js-nav-menu-item">
+            <a href="/service/" class="nav-menu__link">Сервис</a>
+        </div>
+        <div class="nav-menu__item js-nav-menu-item">
+            <a href="/payment/" class="nav-menu__link">Варианты оплаты</a>
+        </div>
+        <div class="nav-menu__socials">
+            <a href="https://vk.com/garantdoorsufa" class="nav-menu__social-link" target="_blank" rel="nofollow noreferrer">
+                <svg class="icon">
+                    <use xlink:href="/resource/img/symbol-sprite.svg#icon-vk"></use>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/garant_dvery/" class="nav-menu__social-link" target="_blank" rel="nofollow noreferrer">
+                <svg class="icon">
+                    <use xlink:href="/resource/img/symbol-sprite.svg#icon-inst"></use>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="nav-menu__footer">
+        <div class="nav-menu__footer-section">
+            <div class="nav-menu__footer-title">GARANT Уфа</div>
+            <div class="nav-menu__footer-item">
+                <a href="tel:+79177694879" class="nav-menu__footer-link">+7 (917) 769-48-79</a>
+            </div>
+            <div class="nav-menu__footer-item">
+                <a href="mailto:info@garantdoors-ufa.ru" class="nav-menu__footer-link">info@garantdoors-ufa.ru</a>
+            </div>
+        </div>
+    </div>
+</div>
