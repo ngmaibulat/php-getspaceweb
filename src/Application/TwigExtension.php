@@ -122,16 +122,21 @@ class TwigExtension extends AbstractExtension
     protected function currentHost()
     {
         // from nginx
-        if ($_SERVER['HTTP_X_FORWARDED_PROTO'] && $_SERVER['HTTP_X_FORWARDED_HOST']) {
-            return $_SERVER['HTTP_X_FORWARDED_PROTO'] . '://' . $_SERVER['HTTP_X_FORWARDED_HOST'];
+        $http_x_forwarded_proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? false;
+        $http_x_forwarded_host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? false;
+        $request_scheme = $_SERVER['REQUEST_SCHEME'] ?? false;
+        $http_host = $_SERVER['HTTP_HOST'] ?? false;
+
+        if ($http_x_forwarded_proto && $http_x_forwarded_host) {
+            return "$http_x_forwarded_proto://$http_x_forwarded_host";
         }
         // from params
         if (($host = $this->parameter('common_homepage', false))) {
             return $host;
         }
         // from request
-        if ($_SERVER['REQUEST_SCHEME'] && $_SERVER['HTTP_HOST']) {
-            return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+        if ($request_scheme && $http_host) {
+            return $request_scheme . '://' . $http_host;
         }
 
         return 'http://localhost';

@@ -1,0 +1,159 @@
+Table "catalog_category" {
+  "uuid" UUID [pk]
+  "parent" UUID [not null, default: "00000000-0000-0000-0000-000000000000"]
+  "title" VARCHAR(255) [not null, default: `''`]
+  "description" TEXT [not null, default: `''`]
+  "address" VARCHAR(1000) [not null, default: `''`]
+  "field1" TEXT [not null, default: `''`]
+  "field2" TEXT [not null, default: `''`]
+  "field3" TEXT [not null, default: `''`]
+  "product" JSON [not null, default: "{}"]
+  "pagination" INTEGER [not null, default: 10]
+  "children" BOOLEAN [not null, default: FALSE]
+  "hidden" BOOLEAN [not null, default: FALSE]
+  "order" INTEGER [not null, default: 1]
+  "status" VARCHAR(100) [not null, default: "work"]
+  "sort" JSON [not null, default: "{}"]
+  "meta" JSON [not null, default: "{}"]
+  "template" JSON [not null, default: "{}"]
+  "external_id" VARCHAR(255) [not null, default: `''`]
+  "export" VARCHAR(50) [not null, default: "manual"]
+}
+
+Table "catalog_attribute" {
+  "uuid" UUID [pk]
+  "title" VARCHAR(255) [not null, default: `''`]
+  "address" VARCHAR(500) [not null, default: `''`]
+  "type" VARCHAR(100) [not null, default: "string"]
+}
+
+Table "catalog_category_attributes" {
+  "category_uuid" UUID [not null]
+  "attribute_uuid" UUID [not null]
+
+Indexes {
+  (category_uuid, attribute_uuid) [pk]
+}
+}
+
+Table "catalog_product" {
+  "uuid" UUID [pk]
+  "category" UUID [not null, default: "00000000-0000-0000-0000-000000000000"]
+  "title" VARCHAR(255) [not null, default: `''`]
+  "type" VARCHAR(100) [not null, default: "product"]
+  "description" TEXT [not null, default: `''`]
+  "extra" TEXT [not null, default: `''`]
+  "address" VARCHAR(1000) [not null, default: `''`]
+  "vendorcode" TEXT [not null, default: `''`]
+  "barcode" TEXT [not null, default: `''`]
+  "tax" DOUBLE [not null, default: 0]
+  "priceFirst" DOUBLE [not null, default: 0]
+  "price" DOUBLE [not null, default: 0]
+  "priceWholesale" DOUBLE [not null, default: 0]
+  "priceWholesaleFrom" DOUBLE [not null, default: 0]
+  "discount" DOUBLE [not null, default: 0]
+  "special" BOOLEAN [not null, default: FALSE]
+  "dimension" JSON [not null, default: "{}"]
+  "volume" DOUBLE [not null, default: 1.0]
+  "unit" VARCHAR(64) [not null, default: `''`]
+  "stock" DOUBLE [not null, default: 0]
+  "field1" TEXT [not null, default: `''`]
+  "field2" TEXT [not null, default: `''`]
+  "field3" TEXT [not null, default: `''`]
+  "field4" TEXT [not null, default: `''`]
+  "field5" TEXT [not null, default: `''`]
+  "country" VARCHAR(255) [not null, default: `''`]
+  "manufacturer" VARCHAR(255) [not null, default: `''`]
+  "tags" JSON [not null, default: "{}"]
+  "order" INTEGER [not null, default: 1]
+  "status" VARCHAR(100) [not null, default: "work"]
+  "date" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "meta" JSON [not null, default: "{}"]
+  "external_id" VARCHAR(255) [not null, default: `''`]
+  "export" VARCHAR(50) [not null, default: "manual"]
+}
+
+Table "catalog_order" {
+  "uuid" UUID [pk]
+  "user_uuid" UUID
+  "status_uuid" UUID
+  "serial" VARCHAR(12) [not null, default: `''`]
+  "delivery" JSONB [not null, default: "{}"]
+  "shipping" timestamp [default: `CURRENT_TIMESTAMP`]
+  "comment" VARCHAR(500) [not null, default: `''`]
+  "phone" VARCHAR(25) [not null, default: `''`]
+  "email" VARCHAR(120) [not null, default: `''`]
+  "date" timestamp [default: `CURRENT_TIMESTAMP`]
+  "external_id" VARCHAR(255) [not null, default: `''`]
+  "export" VARCHAR(50) [not null, default: "manual"]
+  "system" VARCHAR(500) [not null, default: `''`]
+
+Indexes {
+  user_uuid [name: "IDX_4C3AF221ABFE1C6F"]
+  serial [name: "catalog_order_serial_idx"]
+  status_uuid [name: "catalog_order_status_idx"]
+}
+}
+
+Table "catalog_order_status" {
+  "uuid" UUID [pk]
+  "title" VARCHAR(255) [not null, default: `''`]
+  "order" INTEGER [not null, default: 1]
+
+Indexes {
+  title [unique, name: "catalog_order_status_unique"]
+}
+}
+
+Table "catalog_order_product" {
+  "uuid" UUID [pk]
+  "order_uuid" UUID [not null]
+  "product_uuid" UUID [not null]
+  "price" DOUBLE [not null, default: 0]
+  "count" DOUBLE [not null, default: 1]
+
+Indexes {
+  order_uuid [name: "IDX_59DD3D6B9C8E6AB1"]
+  product_uuid [name: "IDX_59DD3D6B5C977207"]
+}
+}
+
+Table "catalog_measure" {
+  "uuid" UUID [pk]
+  "title" VARCHAR(255) [not null, default: `''`]
+  "contraction" VARCHAR(255) [not null, default: `''`]
+  "value" DOUBLE [not null, default: 1.00]
+
+Indexes {
+  contraction [unique, name: "catalog_measure_contraction_unique"]
+}
+}
+
+Table "catalog_product_attributes" {
+  "uuid" UUID [pk]
+  "product_uuid" UUID [not null]
+  "attribute_uuid" UUID [not null]
+  "value" VARCHAR(1000) [not null, default: `''`]
+
+Indexes {
+  product_uuid [name: "IDX_747A21D55C977207"]
+  attribute_uuid [name: "IDX_747A21D58A97F42E"]
+}
+}
+
+Table "catalog_product_related" {
+  "uuid" UUID [pk]
+  "product_uuid" UUID [not null]
+  "related_uuid" UUID [not null]
+  "count" DOUBLE [not null, default: 1]
+
+Indexes {
+  product_uuid [name: "IDX_CFAC628F5C977207"]
+  related_uuid [name: "IDX_CFAC628F3A6DF4A3"]
+}
+}
+
+
+
+Ref: catalog_category_attributes.category_uuid > catalog_category.uuid
+Ref: catalog_category_attributes.attribute_uuid > catalog_attribute.uuid
