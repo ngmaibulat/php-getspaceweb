@@ -6,6 +6,12 @@ use App\Application\i18n;
 
 abstract class AbstractEntity implements \JsonSerializable
 {
+
+    public function getUuid(): \Ramsey\Uuid\UuidInterface
+    {
+        return $this->uuid;
+    }
+
     /**
      * @param string[] $args
      *
